@@ -192,45 +192,65 @@ class MyApp extends StatelessWidget {
       */
         // =====// [4] TypoGraphy - homework answer
         home: Scaffold(
-          appBar: AppBar(),
-          body: Container(
-            height: 200,
-            padding: EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Flexible(
-                  flex: 3,
-                  child: Image.asset('Sony-Alpha-1iv.jpeg'),
-                ),
-                Flexible(
-                    flex: 7,
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Flexible(flex: 5, child: Text('소니 DSLR 100D (단렌즈, 충전기 16기가SD 포함)', style: TextStyle(fontSize: 25)),),
-                          Flexible(flex: 2, child: Text('서울시 송파구 • 끌올 10분 전'),),
-                          Flexible(flex: 3, child: Text('210,000원'),),
-                          /*Flexible(flex: 2, child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Icon(Icons.favorite_border),
-                                  Text('4')
-                                ],
-                              ),
-                          ),*/
-                        ],
+      appBar: AppBar(),
+      body: Container(
+        height: 200,
+        padding: EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Flexible(
+              flex: 3,
+              child: Image.asset('Sony-Alpha-1iv.jpeg'),
+            ),
+            Flexible(
+                flex: 7,
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Flexible(
+                        flex: 5,
+                        child: Text('소니 DSLR 100D (단렌즈, 충전기 16기가SD 포함)',
+                            style: TextStyle(fontSize: 25)),
                       ),
+                      Flexible(
+                        flex: 2,
+                        child: Row(
+                          children: [
+                            Text('서울시 송파구',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.grey)),
+                            Text(' • ',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.grey)),
+                            Text('끌올 10분 전',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: Text('210,000원',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 )),
-                Flexible(
-                    child: Column(
-
-                    )
-                ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  children: [Icon(Icons.favorite_border), Text('4')],
+                )
               ],
             ),
-          ),
+          ],
+        ),
+      ),
     )
         // */
         );
