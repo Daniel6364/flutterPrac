@@ -1,0 +1,130 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+/*
+ *
+ * 코드가 길어지면 커스텀 위젯만드세요
+ * 숙제 : dialog-homework.png
+ *
+ * */
+void main() {
+  runApp(MaterialApp(
+    home: MyApp(),
+  ));
+}
+
+class MyApp extends StatefulWidget {
+  MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var total = 3;
+  var names = ['홍길동', '펜타짐', '미래에셋'];
+  var likes = [0, 0, 0];
+
+  addOne() {
+    setState(() {
+      total++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(total.toString()),
+      ),
+      body: ListView.builder(
+          itemCount: names.length,
+          itemBuilder: (c, i) {
+            return ListTile(
+              leading: Text(
+                likes[i].toString(),
+                style: TextStyle(fontSize: 40),
+              ),
+              title: Text(
+                names[i],
+                style: TextStyle(fontSize: 40),
+              ),
+              trailing: ElevatedButton(
+                child: Text('LIKE'),
+                onPressed: () {
+                  setState(() {
+                    likes[i]++;
+                  });
+                },
+              ),
+            );
+          }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return DialogUI(addOne: addOne);
+              });
+        },
+      ),
+    );
+  }
+}
+
+class DialogUI extends StatelessWidget {
+  DialogUI({Key? key, this.addOne}) : super(key: key);
+
+  final addOne;
+  var inputData = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+        child: Container(
+            width: double.infinity,
+            height: 300,
+            margin: EdgeInsets.all(30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  'Contact',
+                  style: TextStyle(fontSize: 40),
+                ),
+                TextField(
+                  controller: inputData,
+                  // onChanged: (text){ inputData2 = text; print(inputData2);},
+                  style: TextStyle(fontSize: 40),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(fontSize: 30),
+                        )),
+                    TextButton(
+                        onPressed: () {
+                          addOne();
+                          // print(inputData.text);
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'OK',
+                          style: TextStyle(fontSize: 30),
+                        )),
+                  ],
+                )
+              ],
+            )));
+  }
+}
+
