@@ -1,12 +1,20 @@
 import 'dart:ui';
-import 'package:permission_handler/permission_handler.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-/// @Date : 2022/03/07
+///
+/// @Date : 2022/03/05
 /// @Author : daniel
-/// @Description : 유저에게 앱 권한 요청하기
-/// @Comment :
+/// @Description : 코드가 길어지면 커스텀 위젯만드세요
+/// @Comment : dialog-homework.png
+///
+/// 혼자서 해볼 응용사항은
+// - 1. 완료버튼 눌러도 Dialog 닫히게 만들려면?
+// - 2. 빈칸으로 완료버튼 누르면 추가안되게?
+// - 3. 이름옆에 삭제버튼과 기능?
+// - 4. 이름들 가나다순 정렬버튼? (sort함수 사용법을 찾아봅시다)
+// - 5. 전화번호 데이터도 3개 마련해놓고 전화번호도 보여주고 싶으면?
 void main() {
   runApp(MaterialApp(
     home: MyApp(),
@@ -21,35 +29,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-  getPermission() async {
-    var status = await Permission.contacts.status;
-    if (status.isGranted) {
-      print('allowed contact');
-    } else if (status.isDenied) {
-      print('not allowed contact');
-      Permission.contacts.request();
-      openAppSettings();
-    }
-  }
-
-  getCamera() async {
-    var status = await Permission.camera.status;
-    if (status.isGranted) {
-      print('allowed camera');
-    } else if (status.isDenied) {
-      print('not allowed camera');
-      Permission.camera.request();
-      openAppSettings();
-    }
-  }
-
-  /*@override
-  void initState() {
-    super.initState();
-    getPermission();
-  }*/
-
   var names = [];
   var phones = [];
   var likes = [];
@@ -78,12 +57,7 @@ class _MyAppState extends State<MyApp> {
     // names.sort(); /// answer for question 4
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
         title: Text(phoneBook.length.toString()),
-        actions: [
-          IconButton(onPressed: (){getPermission();}, icon: Icon(Icons.contacts)),
-          IconButton(onPressed: (){getCamera();}, icon: Icon(Icons.camera_alt_outlined))
-        ],
       ),
       body: ListView.builder(
           itemCount: phoneBook.length.toInt(),
