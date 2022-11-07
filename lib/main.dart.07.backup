@@ -8,7 +8,11 @@ import 'package:flutter/material.dart';
 /// @Author : daniel
 /// @Description : 유저에게 앱 권한 요청하기
 /// @Comment :
-void main() => runApp(MaterialApp(home: MyApp()));
+void main() {
+  runApp(MaterialApp(
+    home: MyApp(),
+  ));
+}
 
 class MyApp extends StatefulWidget {
   MyApp({Key? key}) : super(key: key);
@@ -18,65 +22,91 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // var contact ;
 
   @override
   void initState() {
-    print("==// initState");
     super.initState();
-    getContactPermission();
+    getContacts();
   }
 
-  List<Contact> contacts = [];
-  Map phones = {};
 
-  delContact(id) async {
-    print("==// delContact");
-    var delContact = Contact();
-    delContact.identifier = id;
-    await ContactsService.deleteContact(delContact);
-    getContact();
+  getPermission() async {
+    var status = await Permission.contacts.status;
+    if (status.isGranted) {
+      print('allowed contact');
+      var contacts = await ContactsService.getContacts();
+
+      for (var i = 0; i < contacts.length; i++) {
+        print(contacts[i].toMap());
+        print(contacts[i].displayName);
+        var phones = contacts[i].phones;
+        for (var j = 0; j < phones!.length; j++) {
+          print(phones[j].label);
+          print(phones[j].value);
+        }
+      }
+    } else if (status.isDenied) {
+      print('not allowed contact');
+      Permission.contacts.request();
+      openAppSettings();
+    }
   }
 
-  addContact(name, phone) async {
-    print("==// addContact");
-    var addContact = Contact();
-    addContact.givenName = name;
-    addContact.phones = [Item(label: 'mobile', value: phone)];
-    await ContactsService.addContact(addContact);
-    getContact();
-  }
-
-  getContact() async {
-    print("==// getContact");
+  getContacts() async {
+    phoneBook = [];
     var contacts = await ContactsService.getContacts();
-
-    Map phoneBook = {};
     for (var i = 0; i < contacts.length; i++) {
+      contact = {};
+      print(contacts[i].toMap());
+      contact["name"] = contacts[i].displayName.toString();
+      contact["id"] = contacts[i].identifier.toString();
+      contact["contact"] = contacts[i];
       var phones = contacts[i].phones;
-      phoneBook[i] = "no data";
       for (var j = 0; j < phones!.length; j++) {
+        contact["phone"] = 'no phone number';
         if (phones[j].label!.contains("mobile")) {
-          phoneBook[i] = phones[j].value.toString();
+          contact["phone"] = phones[j].value.toString();
           break;
         }
       }
+      phoneBook.add(contact);
     }
-
-    setState(() {
-      this.contacts = contacts;
-      phones = phoneBook;
-    });
+    print(phoneBook);
   }
 
-  getContactPermission() async {
-    var status = await Permission.contacts.status;
-    if (status.isGranted) {
-      print("==// granted contact");
-      getContact();
-    } else if (status.isDenied) {
-      print("==// denied contact");
-    }
+
+
+  var names = [];
+  var phones = [];
+  var likes = [];
+
+  var phoneBook = [];
+  Map contact = {};
+
+  addContact(name, phone) {
+    setState(() {
+      // contact = {};
+      // contact["name"] = name;
+      // contact["phone"] = phone;
+      // phoneBook.add(contact);
+
+      var contact = Contact();
+      contact.givenName = name;
+      contact.phones = [Item(label: 'mobile', value: phone)];
+      ContactsService.addContact(contact);
+    });
+    print(phoneBook);
+  }
+
+  delContacts(contact) async {
+    await ContactsService.deleteContact(contact);
+  }
+
+  removeContact(contact) {
+    setState(() {
+      // phoneBook.removeAt(index);
+      delContacts(contact);
+    });
   }
 
   @override
@@ -85,13 +115,17 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(contacts.length.toString()),
+        title: Text(phoneBook.length.toString()),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.pest_control)),
+          IconButton(
+              onPressed: () {
+                getPermission();
+              },
+              icon: Icon(Icons.pest_control)),
         ],
       ),
       body: ListView.builder(
-          itemCount: contacts.length,
+          itemCount: phoneBook.length.toInt(),
           itemBuilder: (c, i) {
             return ListTile(
               /*leading: Icon(
@@ -102,11 +136,11 @@ class _MyAppState extends State<MyApp> {
               title: Row(
                 children: [
                   Text(
-                    contacts[i].displayName.toString() + " : ",
+                    "[" + phoneBook[i]["name"] + "] : ",
                     style: TextStyle(fontSize: 12),
                   ),
                   Text(
-                    phones[i] ?? 'no name',
+                    phoneBook[i]["phone"],
                     style: TextStyle(fontSize: 12),
                   ),
                 ],
@@ -118,8 +152,8 @@ class _MyAppState extends State<MyApp> {
                       context: context,
                       builder: (context) {
                         return DeleteUI(
-                          id: contacts[i].identifier,
-                          delContact: delContact,
+                          removeContact: removeContact,
+                          contact: phoneBook[i]["contact"],
                         );
                       });
 
@@ -135,8 +169,9 @@ class _MyAppState extends State<MyApp> {
               context: context,
               builder: (context) {
                 return DialogUI(
-                  addContact: addContact,
-                );
+                    // addOne: addOne,
+                    // addName: addName,
+                    addContact: addContact);
               });
         },
       ),
@@ -145,11 +180,10 @@ class _MyAppState extends State<MyApp> {
 }
 
 class DeleteUI extends StatelessWidget {
-  DeleteUI({Key? key, this.index, this.id, this.delContact}) : super(key: key);
+  DeleteUI({Key? key, this.removeContact, this.contact}) : super(key: key);
 
-  final index;
-  final id;
-  final delContact;
+  final removeContact;
+  final contact;
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +213,7 @@ class DeleteUI extends StatelessWidget {
                     )),
                 TextButton(
                     onPressed: () {
-                      delContact(id);
+                      removeContact(contact);
                       Navigator.pop(context);
                     },
                     child: Text(
@@ -199,6 +233,7 @@ class DialogUI extends StatelessWidget {
   DialogUI({Key? key, this.addContact}) : super(key: key);
 
   final addContact;
+
   var nameData = TextEditingController();
   var phoneData = TextEditingController();
 
@@ -247,9 +282,13 @@ class DialogUI extends StatelessWidget {
                           var name = nameData.text;
                           var phone = phoneData.text;
                           if (name.isNotEmpty && phone.isNotEmpty) {
-                            addContact(name, phone);
+                            addContact(name.toString(), phone.toString());
                           }
+
+                          /// answer for question 2, 5
                           Navigator.pop(context);
+
+                          /// answer for question 1
                         },
                         child: Text(
                           'OK',
